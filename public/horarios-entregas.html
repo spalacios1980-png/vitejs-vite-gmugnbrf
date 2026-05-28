@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horarios de Entregas — Mi Tablero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Albert+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1e3a5f;
+    --navy-2:#25496f;
+    --navy-deep:#18324f;
+    --line:rgba(255,255,255,.18);
+    --paper:#f3f4f6;
+    --ink:#1e3a5f;
+    --muted:#9fb1c6;
+    --green:#16a34a;
+    --amber:#f59e0b;
+    --red:#dc2626;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:'Albert Sans',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    display:flex;flex-direction:column;min-height:100vh;
+  }
+  header{
+    background:var(--navy);
+    background-image:radial-gradient(120% 120% at 0% 0%, var(--navy-2) 0%, var(--navy) 55%);
+    color:#fff;
+    border-bottom:3px solid var(--green);
+    padding:18px 26px;
+    display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  }
+  .mark{
+    width:46px;height:46px;border-radius:11px;
+    background:var(--green);
+    display:grid;place-items:center;flex-shrink:0;
+    box-shadow:0 6px 18px rgba(22,163,74,.35);
+  }
+  .mark svg{width:26px;height:26px;display:block}
+  .titleblock{line-height:1.05}
+  .titleblock h1{
+    font-family:'Saira Condensed',sans-serif;
+    font-weight:700;font-size:26px;letter-spacing:.5px;text-transform:uppercase;
+  }
+  .titleblock span{font-size:12.5px;color:var(--muted);letter-spacing:.4px}
+  .spacer{flex:1}
+  .clock{text-align:right;line-height:1.15}
+  .clock .date{
+    font-family:'Saira Condensed',sans-serif;
+    font-size:15px;letter-spacing:.5px;text-transform:capitalize;color:#fff;
+  }
+  .clock .time{
+    font-family:'Saira Condensed',sans-serif;
+    font-size:22px;font-weight:700;color:#4ade80;letter-spacing:1px;
+  }
+  .btn{
+    font-family:'Saira Condensed',sans-serif;
+    font-weight:600;font-size:14px;letter-spacing:.6px;text-transform:uppercase;
+    background:rgba(255,255,255,.12);color:#fff;
+    border:1.5px solid var(--line);
+    padding:9px 16px;border-radius:9px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:8px;transition:all .18s ease;
+  }
+  .btn:hover{border-color:var(--green);color:#4ade80}
+  .btn svg{width:16px;height:16px}
+  .btn.spin svg{animation:spin .7s linear}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .legend{
+    background:var(--navy-deep);color:var(--muted);
+    padding:9px 26px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+    font-size:12.5px;letter-spacing:.3px;border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .legend b{
+    font-family:'Saira Condensed',sans-serif;
+    color:#dbe4f0;font-weight:600;letter-spacing:.8px;text-transform:uppercase;margin-right:4px;
+  }
+  .tag{display:inline-flex;align-items:center;gap:7px;color:#dbe4f0}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .dot.r{background:var(--red)}
+  .dot.g{background:var(--green)}
+  .dot.a{background:var(--amber)}
+  main{flex:1;padding:18px;display:flex}
+  .sheet-frame{
+    flex:1;background:#fff;border-radius:14px;border:1px solid #e2e4e9;
+    box-shadow:0 12px 30px rgba(30,58,95,.10);
+    overflow:hidden;position:relative;min-height:520px;
+  }
+  .sheet-frame iframe{width:100%;height:100%;border:0;display:block}
+  .loader{
+    position:absolute;inset:0;display:grid;place-items:center;
+    background:#fff;z-index:2;transition:opacity .4s ease;
+  }
+  .loader.hide{opacity:0;pointer-events:none}
+  .loader .ring{
+    width:34px;height:34px;border-radius:50%;
+    border:3px solid #e6e8ec;border-top-color:var(--green);
+    animation:spin 1s linear infinite;margin-bottom:14px;
+  }
+  .loader p{
+    font-family:'Saira Condensed',sans-serif;letter-spacing:.6px;
+    text-transform:uppercase;font-size:13px;color:#9aa3b2;
+  }
+  footer{text-align:center;color:#9aa3b2;font-size:11.5px;padding:10px;letter-spacing:.3px}
+  footer .live{color:var(--green);font-weight:600}
+  @media (max-width:640px){
+    header{padding:14px 16px;gap:12px}
+    .titleblock h1{font-size:21px}
+    .clock{display:none}
+    .legend{padding:9px 16px;gap:14px}
+    main{padding:12px}
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 17h14M5 17a2 2 0 0 1-2-2v-3l2-5h11l3 5v5a2 2 0 0 1-2 2"/>
+        <circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/>
+      </svg>
+    </div>
+    <div class="titleblock">
+      <h1>Horarios de Entregas</h1>
+      <span>0km · GM · VW · Peugeot · Citroën — La Rioja</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="clock">
+      <div class="date" id="date">—</div>
+      <div class="time" id="time">--:--</div>
+    </div>
+    <button class="btn" id="refresh" title="Actualizar planilla">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12a9 9 0 1 1-2.64-6.36M21 4v5h-5"/>
+      </svg>
+      Actualizar
+    </button>
+  </header>
+  <div class="legend">
+    <b>Estados</b>
+    <span class="tag"><span class="dot r"></span> Pendiente</span>
+    <span class="tag"><span class="dot g"></span> Confirmada / Lista</span>
+    <span class="tag"><span class="dot a"></span> Observación</span>
+  </div>
+  <main>
+    <div class="sheet-frame">
+      <div class="loader" id="loader">
+        <div class="ring"></div>
+        <p>Cargando planilla…</p>
+      </div>
+      <iframe id="sheet" title="Planilla Horarios de Entregas" loading="eager"
+              referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+  </main>
+  <footer>
+    Sincronizado con Google Sheets · <span class="live">EN VIVO</span> — los cambios aparecen al Actualizar.
+  </footer>
+<script>
+  const PUBLISHED_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTiYsWs0zslQsSCa2HdZZA9Cz5Y71eoje_eFG8mPMqsfx29xK8y9lt2MIdzb_5ldVb-A4qMu_XP_56G/pubhtml?gid=0&single=true";
+
+  const iframe  = document.getElementById("sheet");
+  const loader  = document.getElementById("loader");
+  const refresh = document.getElementById("refresh");
+
+  function buildUrl(){
+    const base = `${PUBLISHED_URL}${PUBLISHED_URL.includes("?") ? "&" : "?"}widget=true&headers=false`;
+    return `${base}&_t=${Date.now()}`;
+  }
+  function loadSheet(){ loader.classList.remove("hide"); iframe.src = buildUrl(); }
+  iframe.addEventListener("load", () => loader.classList.add("hide"));
+  refresh.addEventListener("click", () => {
+    refresh.classList.add("spin"); loadSheet();
+    setTimeout(() => refresh.classList.remove("spin"), 700);
+  });
+
+  function tick(){
+    const now = new Date();
+    const opts = { timeZone:"America/Argentina/La_Rioja" };
+    document.getElementById("date").textContent =
+      now.toLocaleDateString("es-AR", {...opts, weekday:"long", day:"2-digit", month:"long"});
+    document.getElementById("time").textContent =
+      now.toLocaleTimeString("es-AR", {...opts, hour:"2-digit", minute:"2-digit"});
+  }
+  tick(); setInterval(tick, 1000);
+  setInterval(loadSheet, 5 * 60 * 1000);
+  loadSheet();
+</script>
+</body>
+</html>
